@@ -39,7 +39,7 @@ public class ReviewController : BaseController
     [HttpGet]
     [Authorize]
     [Route("GetReviews")]
-    public async Task<IActionResult> GetReviewAsync([Required] int index, [Required] string orderId)
+    public async Task<IActionResult> GetReviewAsync([Required] int index, [Required] string storeId)
     {
         try
         {
@@ -47,7 +47,7 @@ public class ReviewController : BaseController
             {
                 return BadRequest();
             }
-            var rs = await ReviewService.GetListReview(index, orderId);
+            var rs = await ReviewService.GetListReview(index, storeId);
             return Ok(rs);
         }
         catch (Exception e)

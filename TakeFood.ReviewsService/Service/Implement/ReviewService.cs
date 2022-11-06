@@ -1,5 +1,4 @@
-﻿using MongoDB.Driver;
-using TakeFood.ReviewsService.Model.Entities.Order;
+﻿using TakeFood.ReviewsService.Model.Entities.Order;
 using TakeFood.ReviewsService.Model.Entities.Review;
 using TakeFood.ReviewsService.Model.Entities.Store;
 using TakeFood.ReviewsService.Model.Entities.User;
@@ -47,11 +46,12 @@ public class ReviewService : IReviewService
         await reviewRepository.InsertAsync(review);
     }
 
-    public async Task<List<ReviewDetailDto>> GetListReview(int index, string orderId)
+    public async Task<List<ReviewDetailDto>> GetListReview(int index, string storeId)
     {
         var list = new List<ReviewDetailDto>();
-        var reviews = await reviewRepository.GetPagingAsync(Builders<Review>.Filter.Eq(x => x.OrderId, orderId), index, 10);
-        foreach (var review in reviews.Data)
+        var orderIds = orderRepository.FindAsync(x => x.StoreId == storeId).Result.Select(x => x.Id);
+        var reviews = reviewRepository.FindAsync(x => orderIds.Contains(x.OrderId)).Result.Take(index * 10).TakeLast(10);
+        foreach (var review in reviews)
         {
             var order = await orderRepository.FindByIdAsync(review.OrderId);
             if (order == null) continue;

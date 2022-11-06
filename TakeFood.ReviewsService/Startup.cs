@@ -173,6 +173,7 @@ public class Startup
         services.AddScoped<IToppingService, ToppingService>();
         services.AddScoped<IVoucherService, VouchersService>();
         services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IStoreService, TakeFood.UserOrderService.Service.Implement.StoreService>();
 
         services.AddScoped<IJwtService, JwtService>(x => new JwtService(x.GetRequiredService<IMongoRepository<UserRefreshToken>>()
