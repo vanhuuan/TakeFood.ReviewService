@@ -1,7 +1,10 @@
-﻿using TakeFood.ReviewsService.Model.Entities.Order;
+﻿using MongoDB.Driver;
+using System.Linq;
+using TakeFood.ReviewsService.Model.Entities.Order;
 using TakeFood.ReviewsService.Model.Entities.Review;
 using TakeFood.ReviewsService.Model.Entities.Store;
 using TakeFood.ReviewsService.Model.Entities.User;
+using TakeFood.ReviewsService.Model.Entities.Voucher;
 using TakeFood.ReviewsService.Model.Repository;
 using TakeFood.ReviewsService.ViewModel.Dtos.Review;
 
@@ -73,6 +76,95 @@ public class ReviewService : IReviewService
             }
             list.Add(detail);
         }
+        return list;
+    }
+
+    public async Task<ReviewPagingResponse> GetManageReview(GetPagingReviewDto dto, string storeID)
+    {
+        var filter = CreateFilter(dto.StartDate, dto.EndDate, storeID);
+        if (dto.PageNumber <= 0 || dto.PageSize <= 0)
+        {
+            throw new Exception("Pagenumber or pagesize can not be  zero or negative");
+        }
+        var rs = await reviewRepository.GetPagingAsync(filter, dto.PageNumber - 1, dto.PageSize);
+
+        var list = new List<ManageReviewDto>();
+        foreach(var review in rs.Data)
+        {
+            list.Add(new ManageReviewDto()
+            {
+                Code = review.Id[19..],
+                Star = review.Star,
+                Description = review.Description,
+                OrderID = review.OrderId,
+                CreatedDate = review.CreatedDate
+            });
+        }
+
+        list = list.OrderBy(x => x.CreatedDate).ToList();
+        list.Reverse();
+
+        var info = new ReviewPagingResponse()
+        {
+            Total = rs.Count,
+            PageIndex = dto.PageNumber,
+            PageSize = dto.PageSize,
+            ManageReviews = list
+        };
+
+        return info;
+    }
+
+    private FilterDefinition<Review> CreateFilter(DateTime? startDate, DateTime? endDate, string storeId)
+    {
+        var orders = orderRepository.Find(x => x.StoreId == storeId);
+        List<string> listOrderID = new List<string>();
+        if(orders != null)
+        {
+            foreach(var order in orders)
+            {
+               listOrderID.Add(order.Id);
+            }
+        }
+        if(listOrderID.Count > 0)
+        {
+            FilterDefinition<Review> filter = Builders<Review>.Filter.Eq(x => x.OrderId, listOrderID[0]);
+            for(int i = 1; i < listOrderID.Count; i++)
+            {
+                filter |= Builders<Review>.Filter.Eq(x => x.OrderId, listOrderID[i]);
+            }
+            if (startDate != null && endDate != null)
+            {
+                filter &= Builders<Review>.Filter.Gte(x => x.CreatedDate, startDate);
+                filter &= Builders<Review>.Filter.Lte(x => x.CreatedDate, endDate);
+            }
+            return filter;
+        }
+
+        return null;
+    }
+
+    public async Task<List<ManageReviewDto>> GetAllReviews(string storeId)
+    {
+        List<Order> orders = (List<Order>)await orderRepository.FindAsync(x => x.StoreId == storeId);
+        List<ManageReviewDto> list = new List<ManageReviewDto>();
+
+        foreach(var order in orders)
+        {
+            Review review = await reviewRepository.FindOneAsync(x => x.OrderId == order.Id);
+            if (review != null) list.Add(new ManageReviewDto()
+            {
+                Code = review.Id.Substring(19),
+                Star = review.Star,
+                Description = review.Description,
+                OrderID = review.OrderId,
+                CreatedDate = review.CreatedDate
+            });
+        }
+
+        list = list.OrderBy(x => x.CreatedDate).ToList();
+        list.Reverse();
+
         return list;
     }
 }
