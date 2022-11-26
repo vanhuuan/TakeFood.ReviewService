@@ -56,6 +56,35 @@ public class ReviewController : BaseController
         }
     }
 
+    [HttpGet]
+    [Route("GetPaging")]
+    public async Task<JsonResult> GetPagingReview(GetPagingReviewDto dto, string storeID)
+    {
+        try
+        {
+            var rs = await ReviewService.GetManageReview(dto, storeID);
+            return new JsonResult(rs);
+        }
+        catch(Exception e)
+        {
+            return new JsonResult(e.Message);
+        }
+    }
+
+    [HttpGet]
+    [Route("GetAllReview")]
+    public async Task<JsonResult> GetAllReviews(string storeID)
+    {
+        try
+        {
+            var rs = await ReviewService.GetAllReviews(storeID);
+            return new JsonResult(rs);
+        }catch(Exception e)
+        {
+            return new JsonResult(e);
+        }
+    }
+
 
     public string GetId()
     {
