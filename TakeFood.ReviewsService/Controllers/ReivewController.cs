@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using TakeFood.ReviewsService.Middleware;
 using TakeFood.ReviewsService.Service;
 using TakeFood.ReviewsService.ViewModel.Dtos.Review;
 
@@ -17,7 +16,6 @@ public class ReviewController : BaseController
     }
 
     [HttpPost]
-    [Authorize]
     [Route("CreateReview")]
     public async Task<IActionResult> AddReviewAsync([FromBody] CreateReviewDto dto)
     {
@@ -37,7 +35,6 @@ public class ReviewController : BaseController
     }
 
     [HttpGet]
-    [Authorize]
     [Route("GetReviews")]
     public async Task<IActionResult> GetReviewAsync([Required] int index, [Required] string storeId)
     {
@@ -65,7 +62,7 @@ public class ReviewController : BaseController
             var rs = await ReviewService.GetManageReview(dto, storeID);
             return new JsonResult(rs);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             return new JsonResult(e.Message);
         }
@@ -79,21 +76,17 @@ public class ReviewController : BaseController
         {
             var rs = await ReviewService.GetAllReviews(storeID);
             return new JsonResult(rs);
-        }catch(Exception e)
+        }
+        catch (Exception e)
         {
             return new JsonResult(e);
         }
     }
 
-
     public string GetId()
     {
-        String token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
-        return JwtService.GetId(token);
-    }
-    public string GetId(string token)
-    {
-        return JwtService.GetId(token);
+        string id = HttpContext.Items["Id"]!.ToString()!;
+        return id;
     }
 
 }

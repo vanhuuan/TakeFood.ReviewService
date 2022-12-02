@@ -1,10 +1,8 @@
 ﻿using MongoDB.Driver;
-using System.Linq;
 using TakeFood.ReviewsService.Model.Entities.Order;
 using TakeFood.ReviewsService.Model.Entities.Review;
 using TakeFood.ReviewsService.Model.Entities.Store;
 using TakeFood.ReviewsService.Model.Entities.User;
-using TakeFood.ReviewsService.Model.Entities.Voucher;
 using TakeFood.ReviewsService.Model.Repository;
 using TakeFood.ReviewsService.ViewModel.Dtos.Review;
 
@@ -89,7 +87,7 @@ public class ReviewService : IReviewService
         var rs = await reviewRepository.GetPagingAsync(filter, dto.PageNumber - 1, dto.PageSize);
 
         var list = new List<ManageReviewDto>();
-        foreach(var review in rs.Data)
+        foreach (var review in rs.Data)
         {
             list.Add(new ManageReviewDto()
             {
@@ -119,17 +117,17 @@ public class ReviewService : IReviewService
     {
         var orders = orderRepository.Find(x => x.StoreId == storeId);
         List<string> listOrderID = new List<string>();
-        if(orders != null)
+        if (orders != null)
         {
-            foreach(var order in orders)
+            foreach (var order in orders)
             {
-               listOrderID.Add(order.Id);
+                listOrderID.Add(order.Id);
             }
         }
-        if(listOrderID.Count > 0)
+        if (listOrderID.Count > 0)
         {
             FilterDefinition<Review> filter = Builders<Review>.Filter.Eq(x => x.OrderId, listOrderID[0]);
-            for(int i = 1; i < listOrderID.Count; i++)
+            for (int i = 1; i < listOrderID.Count; i++)
             {
                 filter |= Builders<Review>.Filter.Eq(x => x.OrderId, listOrderID[i]);
             }
@@ -149,7 +147,7 @@ public class ReviewService : IReviewService
         List<Order> orders = (List<Order>)await orderRepository.FindAsync(x => x.StoreId == storeId);
         List<ManageReviewDto> list = new List<ManageReviewDto>();
 
-        foreach(var order in orders)
+        foreach (var order in orders)
         {
             Review review = await reviewRepository.FindOneAsync(x => x.OrderId == order.Id);
             if (review != null) list.Add(new ManageReviewDto()
