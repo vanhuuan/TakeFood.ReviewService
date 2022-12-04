@@ -169,7 +169,8 @@ public class ReviewService : IReviewService
     public async Task<ReviewDetailDto> GetUserReview(string orderId, string uid)
     {
         var order = await orderRepository.FindByIdAsync(orderId);
-        if (order == null || order.UserId != uid)
+        var user = await userRepository.FindByIdAsync(uid);
+        if (order == null || user == null || order.UserId != uid)
         {
             throw new Exception("Order khong ton tai");
         }
@@ -179,6 +180,7 @@ public class ReviewService : IReviewService
             Description = review.Description,
             Images = review.Imgs,
             Star = review.Star,
+            UserName = user.Name
         };
         return reviewDetail;
     }
