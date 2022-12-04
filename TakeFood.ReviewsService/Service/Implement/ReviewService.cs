@@ -41,7 +41,8 @@ public class ReviewService : IReviewService
         {
             Star = dto.Star,
             OrderId = dto.OrderId,
-            Imgs = dto.Images
+            Imgs = dto.Images,
+            Description = dto.Description
         };
         await storeRepository.UpdateAsync(store);
         await reviewRepository.InsertAsync(review);
