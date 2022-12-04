@@ -54,6 +54,25 @@ public class ReviewController : BaseController
     }
 
     [HttpGet]
+    [Route("GetReview")]
+    public async Task<IActionResult> GetUserReviewAsync([Required] string orderId)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var rs = await ReviewService.GetUserReview(orderId, GetId());
+            return Ok(rs);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpGet]
     [Route("GetPaging")]
     public async Task<JsonResult> GetPagingReview(GetPagingReviewDto dto, string storeID)
     {

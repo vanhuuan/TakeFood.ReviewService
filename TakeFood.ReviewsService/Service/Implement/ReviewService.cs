@@ -165,4 +165,21 @@ public class ReviewService : IReviewService
 
         return list;
     }
+
+    public async Task<ReviewDetailDto> GetUserReview(string orderId, string uid)
+    {
+        var order = await orderRepository.FindByIdAsync(orderId);
+        if (order == null || order.UserId != uid)
+        {
+            throw new Exception("Order khong ton tai");
+        }
+        var review = await reviewRepository.FindOneAsync(x => x.OrderId == orderId);
+        var reviewDetail = new ReviewDetailDto()
+        {
+            Description = review.Description,
+            Images = review.Imgs,
+            Star = review.Star,
+        };
+        return reviewDetail;
+    }
 }
