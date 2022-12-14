@@ -75,6 +75,7 @@ public class ReviewService : IReviewService
             }
             list.Add(detail);
         }
+        list.Reverse();
         return list;
     }
 
@@ -96,12 +97,12 @@ public class ReviewService : IReviewService
                 Star = review.Star,
                 Description = review.Description,
                 OrderID = review.OrderId,
-                CreatedDate = review.CreatedDate
+                CreatedDate = review.CreatedDate,
+                Imgs = review.Imgs
             });
         }
 
-        list = list.OrderBy(x => x.CreatedDate).ToList();
-        list.Reverse();
+        list = list.OrderByDescending(x => x.CreatedDate).ToList();
 
         var info = new ReviewPagingResponse()
         {
@@ -161,7 +162,7 @@ public class ReviewService : IReviewService
             });
         }
 
-        list = list.OrderBy(x => x.CreatedDate).ToList();
+        list = list.OrderByDescending(x => x.CreatedDate).ToList();
         list.Reverse();
 
         return list;
