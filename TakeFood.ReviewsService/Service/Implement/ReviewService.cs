@@ -52,8 +52,8 @@ public class ReviewService : IReviewService
     {
         var list = new List<ReviewDetailDto>();
         var orderIds = orderRepository.FindAsync(x => x.StoreId == storeId).Result.Select(x => x.Id);
-        var reviews = reviewRepository.FindAsync(x => orderIds.Contains(x.OrderId)).Result.Take(index * 10).TakeLast(10);
-        foreach (var review in reviews)
+        var reviews = await reviewRepository.GetPagingAsync(Builders<Review>.Filter.Where(x => orderIds.Contains(x.OrderId)), index, 10);
+        foreach (var review in reviews.Data)
         {
             var order = await orderRepository.FindByIdAsync(review.OrderId);
             if (order == null) continue;
