@@ -29,6 +29,10 @@ public class ReviewService : IReviewService
         {
             throw new Exception("Order's note exist");
         }
+        else if (order.Sate != "Delivered")
+        {
+            throw new Exception("Order's not delivered");
+        }
         var store = await storeRepository.FindOneAsync(x => x.Id == order.StoreId);
         store.NumReiview++;
         store.SumStar += dto.Star;
