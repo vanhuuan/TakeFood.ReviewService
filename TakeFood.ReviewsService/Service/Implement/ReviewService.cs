@@ -56,7 +56,7 @@ public class ReviewService : IReviewService
     {
         var list = new List<ReviewDetailDto>();
         var orderIds = orderRepository.FindAsync(x => x.StoreId == storeId).Result.Select(x => x.Id);
-        var reviews = await reviewRepository.GetPagingAsync(Builders<Review>.Filter.Where(x => orderIds.Contains(x.OrderId)), index, 10);
+        var reviews = await reviewRepository.GetPagingAsync(Builders<Review>.Filter.Where(x => orderIds.Contains(x.OrderId)), index, 10, Builders<Review>.Sort.Descending(x => x.CreatedDate));
         foreach (var review in reviews.Data)
         {
             var order = await orderRepository.FindByIdAsync(review.OrderId);
@@ -67,6 +67,7 @@ public class ReviewService : IReviewService
                 Description = review.Description,
                 Images = review.Imgs,
                 Star = review.Star,
+                Created = review.CreatedDate!.Value
             };
 
             if (user != null)
@@ -90,7 +91,7 @@ public class ReviewService : IReviewService
         {
             throw new Exception("Pagenumber or pagesize can not be  zero or negative");
         }
-        var rs = await reviewRepository.GetPagingAsync(filter, dto.PageNumber - 1, dto.PageSize);
+        var rs = await reviewRepository.GetPagingAsync(filter, dto.PageNumber - 1, dto.PageSize, Builders<Review>.Sort.Descending(x => x.CreatedDate));
 
         var list = new List<ManageReviewDto>();
         foreach (var review in rs.Data)
