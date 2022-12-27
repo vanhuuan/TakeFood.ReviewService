@@ -55,4 +55,6 @@ public class Store : ModelMongoDB
     [BsonElement("cmnd")]
     public string? CMND { get; set; }
 
+    [BsonElement("NameBank")]
+    public string? NameBank { get; set; }
 }
