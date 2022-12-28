@@ -80,7 +80,6 @@ public class ReviewService : IReviewService
             }
             list.Add(detail);
         }
-        list.Reverse();
         return list;
     }
 
